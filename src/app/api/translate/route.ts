@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const OPENAI_KEY = process.env.OPENAI_API_KEY;
+  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
 
   if (!OPENAI_KEY) {
     return NextResponse.json({ 
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
         "Authorization": `Bearer ${OPENAI_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // Use faster model for translation
+        model,
         messages: [
           { 
             role: "system", 

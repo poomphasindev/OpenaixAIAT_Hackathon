@@ -120,7 +120,7 @@
 /* ─── Glass Card ──────────────────────────────────────────── */
 .app-panel {
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 28px;
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow:
     0 8px 32px rgba(23, 32, 29, 0.08),
@@ -132,7 +132,7 @@
 
 .glass-card {
   border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 24px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -454,6 +454,144 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
+/* ─── 3-Surface App Shell ─────────────────────────────────── */
+.now-briefing {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 212, 178, 0.36), transparent 42%),
+    radial-gradient(circle at 90% 18%, rgba(220, 238, 226, 0.54), transparent 38%),
+    rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 14px 42px rgba(23, 32, 29, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  padding: 18px;
+}
+
+.reasoning-trail {
+  border-radius: 18px;
+  background: rgba(251, 250, 246, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  padding: 12px;
+  animation: screen-fade 220ms ease both;
+}
+
+.talk-surface {
+  min-height: 285px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 248, 240, 0.56));
+  box-shadow:
+    0 10px 34px rgba(23, 32, 29, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  padding: 14px;
+}
+
+.talk-bubble {
+  max-width: 92%;
+  border-radius: 20px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(23, 32, 29, 0.06);
+}
+
+.talk-bubble-luma {
+  margin-right: auto;
+  background: rgba(255, 255, 255, 0.86);
+  color: #17201d;
+  border-bottom-left-radius: 8px;
+}
+
+.talk-bubble-user {
+  margin-left: auto;
+  background: #17201d;
+  color: white;
+  border-bottom-right-radius: 8px;
+}
+
+.voice-dock {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 12px 34px rgba(23, 32, 29, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  padding: 14px;
+}
+
+.voice-orb {
+  position: relative;
+  display: grid;
+  height: 76px;
+  width: 76px;
+  place-items: center;
+  overflow: visible;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.96), transparent 28%),
+    linear-gradient(145deg, #6fa174, #45624d);
+  color: white;
+  box-shadow:
+    0 18px 34px rgba(69, 98, 77, 0.28),
+    inset 0 1px 0 rgba(255,255,255,0.38);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.voice-orb:active {
+  transform: scale(0.94);
+}
+
+.voice-orb-active {
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.96), transparent 28%),
+    linear-gradient(145deg, #d98870, #8a4c42);
+}
+
+.voice-ripple {
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1px solid rgba(111, 161, 116, 0.32);
+  animation: voice-ripple 1.8s ease-out infinite;
+}
+
+.voice-ripple-two {
+  animation-delay: 0.7s;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.memory-day {
+  display: grid;
+  aspect-ratio: 1;
+  min-width: 0;
+  place-items: center;
+  border-radius: 13px;
+  color: #17201d;
+  font-size: 11px;
+  font-weight: 950;
+  box-shadow: 0 4px 12px rgba(23, 32, 29, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.memory-day-active {
+  transform: translateY(-3px) scale(1.08);
+  border-color: #17201d;
+  box-shadow: 0 10px 20px rgba(23, 32, 29, 0.18);
+}
+
 /* ─── Energy Beads ────────────────────────────────────────── */
 .energy-bead-track {
   display: grid;
@@ -530,6 +668,10 @@
 }
 
 .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-height: 42px;
   border-radius: 18px;
   background: rgba(251, 250, 246, 0.88);
@@ -713,19 +855,21 @@
 }
 
 .project-brief-panel {
-  width: min(300px, 26vw);
+  width: clamp(280px, 24vw, 320px);
   max-height: min(844px, calc(100dvh - 24px));
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 34px;
+  border-radius: 28px;
   background:
     radial-gradient(circle at 0% 0%, rgba(220, 238, 226, 0.52), transparent 36%),
     radial-gradient(circle at 100% 16%, rgba(255, 212, 178, 0.28), transparent 34%),
     rgba(255, 255, 255, 0.66);
   box-shadow: 0 24px 70px rgba(23, 32, 29, 0.12);
-  padding: 20px;
+  padding: 18px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -733,15 +877,21 @@
 .project-brief-panel::-webkit-scrollbar { display: none; }
 
 .project-hero-copy {
-  border-radius: 28px;
+  border-radius: 22px;
   background:
     linear-gradient(145deg, rgba(255,255,255,0.74), rgba(255,255,255,0.42));
-  padding: 18px;
+  padding: 16px;
+}
+
+.project-hero-copy h1 {
+  font-size: clamp(2rem, 3vw, 2.35rem);
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .brief-card {
   border: 1px solid rgba(255, 255, 255, 0.76);
-  border-radius: 22px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow:
     0 10px 28px rgba(23, 32, 29, 0.07),
@@ -765,19 +915,21 @@
 }
 
 .judge-panel {
-  width: min(340px, 30vw);
+  width: clamp(300px, 26vw, 340px);
   max-height: min(844px, calc(100dvh - 24px));
   flex-direction: column;
   gap: 14px;
   overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 34px;
+  border-radius: 28px;
   background:
     radial-gradient(circle at 10% 0%, rgba(255, 212, 178, 0.26), transparent 34%),
     radial-gradient(circle at 100% 10%, rgba(220, 238, 226, 0.38), transparent 34%),
     rgba(255, 255, 255, 0.68);
   box-shadow: 0 24px 70px rgba(23, 32, 29, 0.14);
-  padding: 20px;
+  padding: 18px;
   backdrop-filter: blur(20px);
 }
 
@@ -785,7 +937,7 @@
 
 .judge-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   border-radius: 18px;
   background: rgba(23, 32, 29, 0.06);
@@ -793,14 +945,18 @@
 }
 
 .judge-tab {
-  display: grid;
-  min-height: 46px;
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
   place-items: center;
-  gap: 3px;
+  gap: 6px;
   border-radius: 14px;
   color: rgba(23, 32, 29, 0.52);
   font-size: 10px;
+  line-height: 1.2;
   font-weight: 900;
+  text-align: center;
 }
 
 .judge-tab-active {
@@ -818,11 +974,12 @@
   border-radius: 16px;
   background: rgba(251, 250, 246, 0.9);
   color: rgba(23, 32, 29, 0.68);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 900;
   padding: 8px;
   box-shadow: 0 4px 14px rgba(23, 32, 29, 0.06);
   text-align: left;
+  line-height: 1.25;
 }
 
 /* ─── Pattern Cards ───────────────────────────────────────── */
@@ -1019,6 +1176,11 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes voice-ripple {
+  0% { opacity: 0.62; transform: scale(0.86); }
+  100% { opacity: 0; transform: scale(1.28); }
+}
+
 @keyframes pattern-flip {
   from { opacity: 0; transform: rotateX(-16deg) translateY(10px); }
   to   { opacity: 1; transform: rotateX(0) translateY(0); }
@@ -1031,7 +1193,7 @@
 
 @media (min-width: 1024px) and (max-width: 1279px) {
   .phone-shell {
-    width: 360px;
+    width: 350px;
     height: min(800px, calc(100dvh - 24px));
     min-height: 720px;
     border-radius: 46px;
@@ -1042,19 +1204,24 @@
   }
 
   .project-brief-panel {
-    width: 270px;
-    padding: 16px;
-    border-radius: 28px;
+    width: 258px;
+    padding: 14px;
+    border-radius: 24px;
   }
 
   .judge-panel {
-    width: 300px;
-    padding: 16px;
-    border-radius: 28px;
+    width: 286px;
+    padding: 14px;
+    border-radius: 24px;
   }
 
   .project-hero-copy h1 {
-    font-size: 2rem;
+    font-size: 1.82rem;
+  }
+
+  .judge-control {
+    font-size: 10px;
+    padding: 7px;
   }
 }
 

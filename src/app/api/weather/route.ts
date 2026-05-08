@@ -1,46 +1,251 @@
 import { NextResponse } from "next/server";
+import type { ExternalContext } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
+
+const MOCK_CONTEXT: ExternalContext = {
+  source: "mock",
+  location: "กรุงเทพฯ",
+  aqi: 145,
+  pm25: 52,
+  temperature: 34,
+  heatIndex: 41,
+  humidity: 78,
+  condition: "hazy",
+  providers: {
+    openaq: false,
+    tmd: false
+  },
+  notes: ["Using mock Bangkok context because one or more API keys/endpoints are missing."]
+};
+
+type NextFetchInit = RequestInit & {
+  next?: {
+    revalidate?: number;
+  };
+};
 
 export async function GET() {
-  const OPENAQ_KEY = process.env.OPENAQ_API_KEY;
-  const TMD_KEY = process.env.TMD_API_KEY;
+  const openAqKey = process.env.OPENAQ_API_KEY;
+  const openAqBaseUrl = process.env.OPENAQ_BASE_URL ?? "https://api.openaq.org/v3";
+  const openAqLocationId = process.env.OPENAQ_LOCATION_ID ?? "2178";
+  const tmdKey = process.env.TMD_API_KEY ?? process.env.TMD_WEATHER_API_KEY;
+  const tmdUrl = process.env.TMD_WEATHER_URL ?? "https://data.tmd.go.th/api/WeatherToday/V1/?uid=api&format=json";
+  const tmdUid = process.env.TMD_UID ?? "api";
 
-  let aqiData = null;
-  let weatherData = null;
+  const notes: string[] = [];
+  let openAqContext: Partial<ExternalContext> | null = null;
+  let tmdContext: Partial<ExternalContext> | null = null;
+
+  if (openAqKey) {
+    try {
+      const openAqResponse = await fetchWithTimeout(`${openAqBaseUrl.replace(/\/$/, "")}/locations/${openAqLocationId}`, {
+        headers: { "X-API-Key": openAqKey },
+        next: { revalidate: 900 }
+      }, 4500);
+
+      if (openAqResponse.ok) {
+        openAqContext = normalizeOpenAq(await openAqResponse.json());
+        if (!openAqContext) {
+          notes.push("OpenAQ response had no usable Thailand PM2.5/AQI data.");
+        }
+      } else {
+        notes.push(`OpenAQ responded ${openAqResponse.status}`);
+      }
+    } catch {
+      notes.push("OpenAQ request failed");
+    }
+  } else {
+    notes.push("OPENAQ_API_KEY is missing");
+  }
+
+  if (tmdKey) {
+    try {
+      const weatherUrl = buildTmdUrl(tmdUrl, tmdKey, tmdUid);
+      const tmdResponse = await fetchWithTimeout(weatherUrl, {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 900 }
+      }, 4500);
+
+      if (tmdResponse.ok) {
+        tmdContext = normalizeTmd(await tmdResponse.json());
+      } else {
+        notes.push(`TMD responded ${tmdResponse.status}`);
+      }
+    } catch {
+      notes.push("TMD request failed");
+    }
+  } else {
+    notes.push("TMD_API_KEY is missing");
+  }
+
+  const liveEnough = Boolean(openAqContext || tmdContext);
+  const context: ExternalContext = {
+    ...MOCK_CONTEXT,
+    ...openAqContext,
+    ...tmdContext,
+    source: openAqContext && tmdContext ? "live" : liveEnough ? "partial" : "mock",
+    providers: {
+      openaq: Boolean(openAqContext),
+      tmd: Boolean(tmdContext)
+    },
+    notes,
+    updatedAt: new Date().toISOString()
+  };
+
+  return NextResponse.json({ success: true, data: context });
+}
+
+async function fetchWithTimeout(input: string, init: NextFetchInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    // 1. Fetch OpenAQ Data (Location 2178 = Bangkok example)
-    if (OPENAQ_KEY) {
-      const aqRes = await fetch("https://api.openaq.org/v3/locations/2178", {
-        headers: { "X-API-Key": OPENAQ_KEY },
-        next: { revalidate: 3600 } // Cache for 1 hour
-      });
-      if (aqRes.ok) {
-        aqiData = await aqRes.json();
-      }
-    }
-
-    // 2. Fetch TMD Weather Data
-    // Replace the URL with the specific TMD endpoint you want to use (e.g. WeatherToday or Weather3Hours)
-    if (TMD_KEY) {
-      const tmdRes = await fetch("https://data.tmd.go.th/api/WeatherToday/V1/?uid=api&ukey=" + TMD_KEY + "&format=json", {
-        headers: { "Accept": "application/json" },
-        next: { revalidate: 3600 }
-      });
-      if (tmdRes.ok) {
-        weatherData = await tmdRes.json();
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        aqi: aqiData || { message: "Mock AQI data (No API key provided)", value: 145 },
-        weather: weatherData || { message: "Mock Weather data (No API key provided)", temp: "41C" }
-      }
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal
     });
-
-  } catch (error) {
-    console.error("Weather API Error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch weather data" }, { status: 500 });
+  } finally {
+    clearTimeout(timeout);
   }
+}
+
+function buildTmdUrl(baseUrl: string, key: string, uid: string) {
+  if (baseUrl.includes("{key}")) return baseUrl.replace("{key}", encodeURIComponent(key));
+  const url = new URL(baseUrl);
+  if (!url.searchParams.has("uid")) url.searchParams.set("uid", uid);
+  if (!url.searchParams.has("ukey")) url.searchParams.set("ukey", key);
+  if (!url.searchParams.has("format")) url.searchParams.set("format", "json");
+  return url.toString();
+}
+
+function normalizeOpenAq(payload: unknown): Partial<ExternalContext> | null {
+  const root = payload as Record<string, unknown>;
+  const result = Array.isArray(root.results) ? root.results[0] as Record<string, unknown> : root;
+  const location = pickString(result, ["name", "locality", "city"]) ?? "กรุงเทพฯ";
+  const countryText = JSON.stringify(result.country ?? "").toLowerCase();
+  const isThailandContext =
+    countryText.includes('"th"') ||
+    countryText.includes("thailand") ||
+    /bangkok|กรุงเทพ|thailand|thai/i.test(location);
+  const latest = findOpenAqMeasurement(result);
+  const pm25 = latest?.value;
+  const aqi = typeof pm25 === "number" ? pm25ToUsAqi(pm25) : undefined;
+
+  if (!isThailandContext || typeof aqi !== "number") {
+    return null;
+  }
+
+  return {
+    location: /bangkok|กรุงเทพ/i.test(location) ? "กรุงเทพฯ" : location,
+    ...(typeof pm25 === "number" ? { pm25 } : {}),
+    ...(typeof aqi === "number" ? { aqi } : {}),
+    condition: typeof aqi === "number" && aqi >= 100 ? "hazy" : "clear"
+  };
+}
+
+function findOpenAqMeasurement(node: unknown): { value: number; unit?: string } | null {
+  if (!node || typeof node !== "object") return null;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = findOpenAqMeasurement(item);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  const record = node as Record<string, unknown>;
+  const parameter = JSON.stringify(record.parameter ?? record.parameter_name ?? record.name ?? "").toLowerCase();
+  const value = firstNumber(record, ["value", "latest", "lastValue"]);
+  if (typeof value === "number" && (parameter.includes("pm25") || parameter.includes("pm2.5") || parameter.includes("pm 2.5"))) {
+    return { value, unit: pickString(record, ["unit", "units"]) };
+  }
+
+  for (const value of Object.values(record)) {
+    const found = findOpenAqMeasurement(value);
+    if (found) return found;
+  }
+
+  return null;
+}
+
+function normalizeTmd(payload: unknown): Partial<ExternalContext> {
+  const flat = flattenObjects(payload);
+  const bangkok = flat.find((item) => {
+    const text = JSON.stringify(item);
+    return text.includes("กรุงเทพ") || /bangkok/i.test(text);
+  }) ?? flat[0] ?? {};
+
+  const temperature = firstNumber(bangkok, ["Temperature", "temperature", "Temp", "tc", "AirTemperature"]);
+  const humidity = firstNumber(bangkok, ["RelativeHumidity", "humidity", "Humidity", "rh"]);
+  const condition = pickString(bangkok, ["Weather", "weather", "Description", "description", "Condition"]) ?? "hazy";
+
+  return {
+    ...(typeof temperature === "number" ? { temperature, heatIndex: estimateHeatIndex(temperature, humidity ?? MOCK_CONTEXT.humidity) } : {}),
+    ...(typeof humidity === "number" ? { humidity } : {}),
+    condition
+  };
+}
+
+function flattenObjects(value: unknown): Array<Record<string, unknown>> {
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value)) return value.flatMap(flattenObjects);
+
+  const record = value as Record<string, unknown>;
+  return [record, ...Object.values(record).flatMap(flattenObjects)];
+}
+
+function firstNumber(record: Record<string, unknown>, keys: string[]): number | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string") {
+      const parsed = Number(value.replace(/[^\d.-]/g, ""));
+      if (Number.isFinite(parsed)) return parsed;
+    }
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const nested = firstNumber(value as Record<string, unknown>, keys);
+      if (typeof nested === "number") return nested;
+    }
+  }
+  return undefined;
+}
+
+function pickString(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function pm25ToUsAqi(pm25: number) {
+  const breakpoints = [
+    [0, 12, 0, 50],
+    [12.1, 35.4, 51, 100],
+    [35.5, 55.4, 101, 150],
+    [55.5, 150.4, 151, 200],
+    [150.5, 250.4, 201, 300],
+    [250.5, 350.4, 301, 400],
+    [350.5, 500.4, 401, 500]
+  ];
+  const bp = breakpoints.find(([low, high]) => pm25 >= low && pm25 <= high) ?? breakpoints[breakpoints.length - 1];
+  const [cLow, cHigh, iLow, iHigh] = bp;
+  return Math.round(((iHigh - iLow) / (cHigh - cLow)) * (pm25 - cLow) + iLow);
+}
+
+function estimateHeatIndex(tempC: number, humidity: number) {
+  if (tempC < 27 || humidity < 40) return Math.round(tempC);
+  const tempF = tempC * 1.8 + 32;
+  const hiF =
+    -42.379 +
+    2.04901523 * tempF +
+    10.14333127 * humidity -
+    0.22475541 * tempF * humidity -
+    0.00683783 * tempF * tempF -
+    0.05481717 * humidity * humidity +
+    0.00122874 * tempF * tempF * humidity +
+    0.00085282 * tempF * humidity * humidity -
+    0.00000199 * tempF * tempF * humidity * humidity;
+  return Math.round((hiF - 32) / 1.8);
 }

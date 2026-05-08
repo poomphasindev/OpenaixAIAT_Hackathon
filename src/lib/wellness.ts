@@ -68,29 +68,29 @@ export function buildPatterns(entries: DailyEntry[]): PatternMemory[] {
   return [
     {
       id: "sleep-energy",
-      label: "การนอนช่วยกันพลังตกช่วงบ่าย",
-      evidence: `7 วันที่ผ่านมา นอนน้อยจับคู่กับพลังต่ำ ${lowSleepLowEnergy.length} ครั้ง ข้อนี้ตรงกับคุณไหม`,
+      label: "Sleep protects your afternoon",
+      evidence: `In the last 7 days, short sleep paired with low energy ${lowSleepLowEnergy.length} time(s). Does this feel true?`,
       confidence: confidenceFromCount(lowSleepLowEnergy.length),
       confirmation: "unconfirmed"
     },
     {
       id: "caffeine-loop",
-      label: "กาแฟช่วงท้ายวันอาจอยู่ในวงจรพลังตก",
-      evidence: `7 วันที่ผ่านมา กาแฟสูงและนอนแย่เกิดคู่กัน ${caffeineLoop.length} ครั้ง เป็นข้อสังเกตแรก ๆ ยังไม่ใช่ข้อสรุป`,
+      label: "Late caffeine may be part of the dip loop",
+      evidence: `In the last 7 days, high caffeine and poor sleep appeared together ${caffeineLoop.length} time(s). Early signal, not a verdict.`,
       confidence: confidenceFromCount(caffeineLoop.length),
       confirmation: "unconfirmed"
     },
     {
       id: "workload-carryover",
-      label: "วันที่ข้อความเยอะพาความเครียดข้ามวัน",
-      evidence: `7 วันที่ผ่านมา งานแน่นและความเครียดสูงเกิดพร้อมกัน ${overload.length} ครั้ง`,
+      label: "Message-heavy days carry stress forward",
+      evidence: `In the last 7 days, packed work and high stress appeared together ${overload.length} time(s).`,
       confidence: confidenceFromCount(overload.length),
       confirmation: "unconfirmed"
     },
     {
       id: "movement-buffer",
-      label: "การขยับเบา ๆ ช่วยให้พลังนิ่งขึ้น",
-      evidence: `7 วันที่ผ่านมา วันที่ขยับเกิน 25 นาทีมักพลังดีกว่า ${movementHelps.length} ครั้ง`,
+      label: "Light movement steadies energy",
+      evidence: `In the last 7 days, days with 25+ minutes of movement tended to feel better ${movementHelps.length} time(s).`,
       confidence: confidenceFromCount(movementHelps.length),
       confirmation: "unconfirmed"
     }

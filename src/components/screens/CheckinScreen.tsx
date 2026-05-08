@@ -4,6 +4,7 @@ import { BatteryLow, Bed, Brain, BriefcaseBusiness, CloudFog, Coffee, Focus, Lea
 import { useEffect, useState } from "react";
 import { EnergyBead } from "@/components/EnergyBead";
 import { scenarios } from "@/data/seed";
+import type { Language } from "@/lib/types";
 
 const SCENARIO_ICON = {
   aqi: CloudFog,
@@ -27,6 +28,27 @@ const PLACEHOLDERS = [
   "เล่าแบบสั้น ๆ ก็ได้ Luma จะช่วยจับ pattern ให้"
 ];
 
+const CHECKIN_COPY = {
+  th: {
+    kicker: "เช็คอินอัจฉริยะ",
+    title: "วันนี้ร่างกายเป็นยังไง",
+    bead: "เม็ดพลังงาน",
+    beadHelp: "เลือกความรู้สึก ไม่ใช่กรอกฟอร์มแพทย์",
+    tell: "เล่าให้ Luma ฟัง",
+    submit: "สร้างแผนวันนี้",
+    scenarios: "สถานการณ์ demo"
+  },
+  en: {
+    kicker: "smart check-in",
+    title: "How is today landing?",
+    bead: "Energy bead",
+    beadHelp: "Pick a feeling, not a clinical form",
+    tell: "Tell Luma what changed",
+    submit: "Build my day",
+    scenarios: "Demo scenarios"
+  }
+};
+
 const SCENARIO_STYLE: Record<string, { bg: string; border: string; text: string }> = {
   aqi:      { bg: "#e8f3f8", border: "#c8e6f9", text: "#2a5f7a" },
   caffeine: { bg: "#fff8e8", border: "#f4c95d55", text: "#7a5b20" },
@@ -36,11 +58,12 @@ const SCENARIO_STYLE: Record<string, { bg: string; border: string; text: string 
 };
 
 export function CheckinScreen({
-  checkin, moodRating, voiceActive, onMood, onCheckin, onSubmit, onVoice, onScenario
+  checkin, moodRating, voiceActive, language, onMood, onCheckin, onSubmit, onVoice, onScenario
 }: {
   checkin: string;
   moodRating: number;
   voiceActive: boolean;
+  language: Language;
   onMood: (r: number) => void;
   onCheckin: (v: string) => void;
   onSubmit: () => void;
@@ -49,6 +72,7 @@ export function CheckinScreen({
 }) {
   const [mode, setMode] = useState("energy");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const copy = CHECKIN_COPY[language];
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -61,20 +85,20 @@ export function CheckinScreen({
     <div className="screen-fade px-4 pb-36 space-y-3">
       {/* Header */}
       <header className="pt-1">
-        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-moss/70">เช็คอินอัจฉริยะ</p>
-        <h2 className="text-2xl font-black text-ink leading-tight">วันนี้ร่างกายเป็นยังไง</h2>
+        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-moss/70">{copy.kicker}</p>
+        <h2 className="text-2xl font-black text-ink leading-tight">{copy.title}</h2>
       </header>
 
       {/* Energy bead */}
       <section className="app-panel">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">เม็ดพลังงาน</p>
-            <p className="text-xs font-bold text-ink/45">เลือกความรู้สึก ไม่ใช่กรอกฟอร์มแพทย์</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">{copy.bead}</p>
+            <p className="text-xs font-bold text-ink/45">{copy.beadHelp}</p>
           </div>
           <span className="rounded-full bg-ink px-3 py-1 text-xs font-black text-white">{moodRating}/5</span>
         </div>
-        <EnergyBead value={moodRating} onChange={onMood} />
+        <EnergyBead value={moodRating} language={language} onChange={onMood} />
 
         <div className="mt-4 grid grid-cols-5 gap-1.5">
           {MODES.map(({ id, label, icon: Icon }) => (
@@ -92,7 +116,7 @@ export function CheckinScreen({
 
       {/* Diary input */}
       <section className="app-panel space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">เล่าให้ Luma ฟัง</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">{copy.tell}</p>
         <div className="rounded-[22px] bg-paper/80 p-3 border border-white/70">
           <textarea
             id="checkin-textarea"
@@ -132,14 +156,14 @@ export function CheckinScreen({
             className="rounded-[22px] bg-ink px-5 py-3.5 text-sm font-black text-white transition-transform active:scale-95"
             onClick={onSubmit}
           >
-            สร้างแผนวันนี้
+            {copy.submit}
           </button>
         </div>
       </section>
 
       {/* Demo scenarios */}
       <section className="app-panel">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss mb-3">สถานการณ์ demo</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss mb-3">{copy.scenarios}</p>
         <div className="grid grid-cols-2 gap-2">
           {scenarios.map((s) => {
             const st = SCENARIO_STYLE[s.id] ?? { bg: "#f8f8f8", border: "#eee", text: "#333" };

@@ -28,23 +28,23 @@ type DaySeed = {
 export const demoUser = {
   name: "Beam",
   age: 24,
-  city: "กรุงเทพฯ",
+  city: "Bangkok",
   streak: 15,
   joinedDaysAgo: 31,
-  goal: "รักษาพลังให้คงที่ช่วง hackathon",
-  persona: "student builder ที่เขียนโค้ดดึก ดื่มกาแฟ และอยากมี routine ที่ใจดีกับตัวเองขึ้น"
+  goal: "keep energy steady during the hackathon",
+  persona: "student builder who codes late, drinks coffee, and wants kinder routines"
 };
 
 export const todayContext = {
-  location: "กรุงเทพฯ",
+  location: "Bangkok",
   aqi: 145,
   temperature: 34,
   heatIndex: 41,
   sleepHours: 5,
   humidity: 66,
   commuteLoad: "medium",
-  headline: "วันนี้อากาศกรุงเทพฯ หนักกว่าปกติ",
-  recommendation: "ปิดหน้าต่าง เลื่อนวิ่งกลางแจ้ง และยืดเหยียดในห้อง 10 นาทีก่อนเที่ยง",
+  headline: "Bangkok air is heavier than usual today",
+  recommendation: "Close the windows, move outdoor running indoors, and stretch for 10 minutes before lunch",
   crashWindow: "15:00"
 };
 
@@ -60,25 +60,25 @@ export const currentLumaScoreInput = {
 
 export const mockForecast: EnergyForecast = {
   timeSlots: [
-    { time: "08:00", status: "stable", confidence: 90, recommendation: "เริ่มด้วยงานเบา" },
-    { time: "10:00", status: "optimal", confidence: 85, recommendation: "ช่วงทำงานลึก" },
-    { time: "12:00", status: "declining", confidence: 75, recommendation: "กินก่อนหิวจัด" },
-    { time: "15:00", status: "crash", confidence: 80, recommendation: "ยืดเหยียดในห้อง งดกาแฟเพิ่ม" },
-    { time: "17:00", status: "recovery", confidence: 70, recommendation: "งานเบา/อ่านสั้น ๆ" },
-    { time: "20:00", status: "stable", confidence: 65, recommendation: "เตรียมพรุ่งนี้ ลดแสงจอ" }
+    { time: "08:00", status: "stable", confidence: 90, recommendation: "Start with light tasks" },
+    { time: "10:00", status: "optimal", confidence: 85, recommendation: "Deep work window" },
+    { time: "12:00", status: "declining", confidence: 75, recommendation: "Eat before hunger hits" },
+    { time: "15:00", status: "crash", confidence: 80, recommendation: "Indoor reset, no extra coffee" },
+    { time: "17:00", status: "recovery", confidence: 70, recommendation: "Light reading or admin" },
+    { time: "20:00", status: "stable", confidence: 65, recommendation: "Prep tomorrow, dim screens" }
   ],
-  summary: "คาดว่าพลังจะตกช่วง 15:00 จากการนอน 5 ชม. + AQI 145"
+  summary: "Energy dip predicted around 15:00 from 5h sleep + AQI 145"
 };
 
 export const mockCalendar: CalendarEvent[] = [
   {
     id: "cal-commute",
-    title: "เดินทางด้วย BTS",
+    title: "BTS commute",
     type: "commute",
     startTime: "2026-05-09T08:30:00",
     endTime: "2026-05-09T09:15:00",
     energyImpact: "medium",
-    lumaNote: "วันนี้ AQI 145 ใส่หน้ากากและลดการเดินกลางแจ้ง"
+    lumaNote: "AQI 145 today. Wear a mask and reduce outdoor walking."
   },
   {
     id: "cal-review",
@@ -87,25 +87,25 @@ export const mockCalendar: CalendarEvent[] = [
     startTime: "2026-05-09T10:00:00",
     endTime: "2026-05-09T11:30:00",
     energyImpact: "high",
-    lumaNote: "ช่วงใช้พลังสูง กินมื้อเช้าก่อนเริ่ม"
+    lumaNote: "High-focus block. Eat before you start."
   },
   {
     id: "cal-lunch",
-    title: "มื้อเที่ยงกันพลังตก",
+    title: "Protected lunch",
     type: "meal",
     startTime: "2026-05-09T12:00:00",
     endTime: "2026-05-09T12:30:00",
     energyImpact: "recovery",
-    lumaNote: "กันไว้ก่อนช่วงพลังตกประมาณ 15:00"
+    lumaNote: "Protected before the likely 15:00 dip."
   },
   {
     id: "cal-family",
-    title: "มื้อเย็นกับครอบครัว",
+    title: "Dinner with family",
     type: "social",
     startTime: "2026-05-09T19:00:00",
     endTime: "2026-05-09T21:00:00",
     energyImpact: "recovery",
-    lumaNote: "เป็นช่วงเติมพลังทางใจ อย่าเพิ่งตัดออกเป็นอย่างแรก"
+    lumaNote: "A real recovery block. Do not cut this first."
   }
 ];
 
@@ -113,107 +113,107 @@ export const demoNotifications: DemoNotification[] = [
   {
     id: "n1",
     type: "proactive",
-    title: "สรุปเช้านี้",
-    body: "วันนี้ AQI 145 Luma เลื่อนวิ่งกลางแจ้งเป็นยืดเหยียดในห้อง",
+    title: "Morning brief",
+    body: "AQI is 145. Luma moved the outdoor run to an indoor stretch.",
     timestamp: "08:00",
-    action: "ดูแผน"
+    action: "View plan"
   },
   {
     id: "n2",
     type: "alert",
-    title: "คาดว่าพลังจะตก",
-    body: "จากการนอน + AQI วันนี้ คุณอาจหมดแรงช่วง 15:00 กินก่อน 12:00",
+    title: "Energy dip predicted",
+    body: "Based on sleep + AQI, you may dip around 15:00. Eat before noon.",
     timestamp: "11:30",
-    action: "ตั้งเตือน"
+    action: "Set reminder"
   },
   {
     id: "n3",
     type: "celebration",
-    title: "เช็คอินครบ 7 วัน",
-    body: "คุณบันทึกครบ 7 วัน Luma เจอ 3 pattern ใหม่ ลองอ่านจดหมายสรุป",
+    title: "7-day check-in streak",
+    body: "You logged 7 days. Luma found 3 new patterns in your week.",
     timestamp: "20:00",
-    action: "อ่านสรุป"
+    action: "Read summary"
   },
   {
     id: "n4",
     type: "proactive",
-    title: "ถึงเวลาลดจอ",
-    body: "พรุ่งนี้มี sprint review นอนก่อน 23:30 จะเริ่มวันได้ง่ายขึ้น",
+    title: "Wind-down window",
+    body: "Sprint review tomorrow. Sleep before 23:30 to make the morning easier.",
     timestamp: "22:00",
-    action: "ตั้งปลุก"
+    action: "Set alarm"
   }
 ];
 
 export const weeklyLetter: WeeklyLetter = {
   weekNumber: 3,
   daysLogged: 7,
-  opening: "สวัสดี Beam,\n\nอาทิตย์นี้คุณส่งมา 7 วันเต็ม — Luma อยากเล่าให้ฟัง:",
+  opening: "Hey Beam,\n\nYou checked in for a full 7 days. Here is the honest version of what Luma noticed:",
   highlights: [
     {
       type: "win",
-      title: "วันที่ดีที่สุด: 7 พ.ค.",
-      description: "นอน 7 ชม. ขยับตัวในห้อง และกาแฟเบาลง วันนี้คุณใกล้จังหวะลื่นไหล"
+      title: "Best day: May 7",
+      description: "7h sleep, indoor movement, and lighter caffeine. That was closest to your flow rhythm."
     },
     {
       type: "challenge",
-      title: "วันที่หนักสุด: 8 พ.ค.",
-      description: "AQI 145 + นอน 5 ชม. ทำให้วันหนักขึ้น แต่คุณยังเช็คอินได้"
+      title: "Hardest day: May 8",
+      description: "AQI 145 plus 5h sleep made the day heavier, but you still checked in."
     },
     {
       type: "pattern",
-      title: "สิ่งที่เริ่มเห็น",
-      description: "กาแฟช่วงบ่ายแก่ ๆ + ใช้จอหนัก มักมาก่อนคืนที่นอนน้อย"
+      title: "Pattern to test",
+      description: "Late caffeine plus screen-heavy work often appears before shorter sleep."
     }
   ],
-  lumaInsight: "วันที่พลังตกไม่ได้สุ่มทั้งหมด มักมารวมกับ AQI สูง นอนน้อย และกาแฟช่วงท้ายวัน",
-  recommendation: "สัปดาห์หน้า ลองจบกาแฟก่อน 14:00 แล้วดูว่านอนดีขึ้นไหม",
-  closing: "ไม่ต้อง perfect นะ Beam — แค่รู้ตัวก็เก่งแล้ว\n\nLuma",
-  thaiContext: "AQI กรุงเทพฯ เฉลี่ยสัปดาห์นี้ประมาณ 135 Luma จึงย้ายกิจกรรมกลางแจ้งเป็นช่วงฟื้นตัวในห้อง"
+  lumaInsight: "Your energy dips are not random. They cluster around high AQI, short sleep, and late caffeine.",
+  recommendation: "Next week, try ending caffeine before 14:00. Let’s see if sleep gets easier.",
+  closing: "No need to be perfect, Beam. Noticing the pattern is already progress.\n\nLuma",
+  thaiContext: "Bangkok AQI averaged around 135 this week, so Luma moved outdoor activity into indoor recovery blocks."
 };
 
 export const hiddenPatterns: HiddenPattern[] = [
   {
     id: "hidden-pm25-lunch",
-    title: "PM2.5 ทำให้มื้อเที่ยงเลื่อน",
-    description: "วันที่ AQI สูง มื้อเที่ยงมักเลื่อนไป 2-3 ชั่วโมง",
-    evidence: ["3 พ.ค.: AQI 160, เที่ยง 14:30", "7 พ.ค.: AQI 155, เที่ยง 15:00", "8 พ.ค.: AQI 145, กินเบา"],
+    title: "PM2.5 lunch drift",
+    description: "On high-AQI days, lunch tends to slide 2-3 hours later",
+    evidence: ["May 3: AQI 160, lunch 14:30", "May 7: AQI 155, lunch 15:00", "May 8: AQI 145, light meal"],
     confidence: 85,
     status: "hidden",
-    reward: "เจอ pattern เฉพาะชีวิตกรุงเทพฯ แล้ว"
+    reward: "Bangkok-specific pattern found"
   },
   {
     id: "hidden-caffeine-loop",
-    title: "วงจรกาแฟช่วงบ่าย",
-    description: "กาแฟหลัง 15:00 มักมาก่อนนอนแย่และต้องพึ่งกาแฟเพิ่ม",
-    evidence: ["16 เม.ย.", "27 เม.ย.", "6 พ.ค."],
+    title: "Afternoon caffeine loop",
+    description: "Coffee after 15:00 often comes before poor sleep and more coffee the next day",
+    evidence: ["Apr 16", "Apr 27", "May 6"],
     confidence: 90,
     status: "revealed",
-    reward: "เจอวงจรที่น่าลองตัดแล้ว"
+    reward: "A loop worth testing"
   },
   {
     id: "hidden-family-recharge",
-    title: "ช่วงเติมพลังจากคนใกล้ตัว",
-    description: "มื้อเย็นกับครอบครัวมักช่วยให้วันถัดไปนิ่งขึ้น ถ้าไม่ต่อด้วย coding ดึก",
-    evidence: ["13 เม.ย.", "29 เม.ย.", "7 พ.ค."],
+    title: "Family recharge window",
+    description: "Dinner with family often steadies the next day, unless it is followed by late coding",
+    evidence: ["Apr 13", "Apr 29", "May 7"],
     confidence: 72,
     status: "hidden",
-    reward: "เจอ pattern ที่ใจดีกับตัวเองขึ้น"
+    reward: "A kinder routine pattern"
   }
 ];
 
 export const aiDecisionLog: AiDecisionLog[] = [
-  { id: "log-1", kind: "input", text: "ผู้ใช้เช็คอิน: พลัง 3/5, เครียด 7/10" },
-  { id: "log-2", kind: "rule", text: "กฎทำงาน: AQI > 100 ย้ายกิจกรรมกลางแจ้งเป็นในอาคาร" },
-  { id: "log-3", kind: "pattern", text: "pattern ตรงกัน: นอน < 6 ชม. + AQI สูง มักมาก่อนพลังตกช่วง 15:00" },
-  { id: "log-4", kind: "recommendation", text: "คำแนะนำ: กินก่อน 12:00 + ยืดเหยียดในห้อง 10 นาที" }
+  { id: "log-1", kind: "input", text: "Beam checked in: energy 3/5, stress 7/10" },
+  { id: "log-2", kind: "rule", text: "Rule: AQI > 100 moves outdoor activity indoors" },
+  { id: "log-3", kind: "pattern", text: "Pattern match: sleep < 6h + high AQI often precedes a 15:00 dip" },
+  { id: "log-4", kind: "recommendation", text: "Recommendation: eat before noon + 10-minute indoor reset" }
 ];
 
 export const pitchChecklist: PitchPoint[] = [
-  { id: "pitch-thai", label: "บริบทไทยชัดตั้งแต่ 3 วินาทีแรก", done: true },
+  { id: "pitch-thai", label: "Thai context is obvious in the first 3 seconds", done: true },
   { id: "pitch-privacy", label: "Privacy by design", done: true },
-  { id: "pitch-collab", label: "AI เรียนรู้ร่วมกับผู้ใช้", done: true },
-  { id: "pitch-proactive", label: "แจ้งเตือนก่อนพลังตก", done: true },
-  { id: "pitch-real-api", label: "ต่อ API จริงหลังใส่ .env", done: false },
+  { id: "pitch-collab", label: "AI learns with the user", done: true },
+  { id: "pitch-proactive", label: "Warns before the energy dip", done: true },
+  { id: "pitch-real-api", label: "Live APIs enabled after .env", done: true },
   { id: "pitch-camera", label: "Camera face tracking", done: false }
 ];
 
@@ -306,26 +306,26 @@ export const seedEntries: DailyEntry[] = daySeeds.map((seed, index) => ({
 export const todaySchedule = [
   {
     time: "09:10",
-    label: "เริ่มวันแบบเบา",
-    detail: "น้ำ + มื้อเช้าก่อน sprint แรก",
+    label: "Soft start",
+    detail: "Water + breakfast before the first sprint",
     status: "done"
   },
   {
     time: "12:30",
-    label: "ล็อกมื้อเที่ยง",
-    detail: "กินให้ห่างจาก laptop สักช่วง",
+    label: "Protected lunch",
+    detail: "Eat away from the laptop for one short block",
     status: "next"
   },
   {
     time: "14:30",
-    label: "รีเซ็ตแบบเลี่ยงฝุ่น",
-    detail: "เดินในห้อง 10 นาที ยังไม่เติมกาแฟ",
+    label: "Indoor reset",
+    detail: "Walk indoors for 10 minutes, no extra coffee yet",
     status: "alert"
   },
   {
     time: "21:40",
-    label: "ทางลงก่อนนอน",
-    detail: "ลดแสงจอและจอด task list ของพรุ่งนี้",
+    label: "Landing strip",
+    detail: "Dim screens and park tomorrow's task list",
     status: "later"
   }
 ];
@@ -333,48 +333,48 @@ export const todaySchedule = [
 export const coachMessages = [
   {
     from: "RoutineSense",
-    text: "Luma เห็น pattern คล้ายวันที่ 5-6 พ.ค.: นอนน้อย, AQI สูง, ใช้จอหนัก วันนี้ขอทำให้แผนเล็กและฟื้นตัวง่ายขึ้น"
+    text: "Luma sees a pattern like May 5-6: short sleep, high AQI, and heavy screen work. Today should be smaller and more recoverable."
   },
   {
     from: "Beam",
-    text: "คืนนี้ยังต้อง build ต่อ พักทั้งวันไม่ได้"
+    text: "I still need to build tonight. I cannot rest all day."
   },
   {
     from: "RoutineSense",
-    text: "งั้นชัยชนะวันนี้ไม่ใช่การพักทั้งวัน แต่คือกันพลังตกตอน 15:00: กินก่อน ขยับในห้อง และล็อก build block หนึ่งช่วง"
+    text: "Then the win is not resting all day. The win is protecting the 15:00 dip: eat first, move indoors, then lock one build block."
   }
 ];
 
 export const scenarios: Scenario[] = [
   {
     id: "aqi",
-    label: "นอนน้อย + AQI สูง",
-    checkin: "เมื่อคืนผมนอนน้อยประมาณห้าชั่วโมง อากาศข้างนอกฝุ่นเยอะ และก่อนเที่ยงก็เริ่มหมดแรงแล้ว"
+    label: "Low sleep + high AQI",
+    checkin: "I slept about five hours, the air outside feels heavy, and I already feel low before lunch."
   },
   {
     id: "caffeine",
-    label: "วงจรกาแฟ",
-    checkin: "เมื่อวานดื่มกาแฟเยอะแล้วนอนดึกอีก วันนี้อยากโฟกัส แต่ไม่อยากพลังตกซ้ำ"
+    label: "Caffeine loop",
+    checkin: "I had too much coffee yesterday and slept late again. I want to focus today without crashing twice."
   },
   {
     id: "overload",
-    label: "Sprint แน่น",
-    checkin: "วันนี้ตารางแน่น ข้อความเข้าตลอด และยังไม่ทันเริ่มวันก็รู้สึกเครียดแล้ว"
+    label: "Packed sprint",
+    checkin: "Today is packed, messages keep coming in, and I feel stressed before I even start."
   },
   {
     id: "balanced",
-    label: "วันที่ค่อนข้างนิ่ง",
-    checkin: "เมื่อคืนผมนอนดี กินมื้อเช้าแล้ว และรู้สึกนิ่งพอสมควร วันนี้อยากรักษาจังหวะนี้ไว้"
+    label: "Steady day",
+    checkin: "I slept well, ate breakfast, and feel pretty steady. I want to keep this rhythm."
   },
   {
     id: "crisis",
-    label: "โหมดความปลอดภัย",
-    checkin: "ผมรู้สึกว่าอาจทำร้ายตัวเอง และตอนนี้ไม่รู้สึกปลอดภัยถ้าต้องอยู่คนเดียว"
+    label: "Safety mode",
+    checkin: "I feel like I might hurt myself, and I do not feel safe being alone right now."
   },
   {
     id: "heat",
-    label: "ล้าจากอากาศร้อน",
-    checkin: "วันนี้กรุงเทพฯ ร้อนมาก ผมนอนหลับไม่ลึก และร่างกายช้ามากก่อนเริ่มงาน"
+    label: "Hot-season fatigue",
+    checkin: "Bangkok feels very hot today. I did not sleep deeply, and my body feels slow before work."
   }
 ];
 

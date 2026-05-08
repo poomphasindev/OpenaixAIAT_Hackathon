@@ -1,5 +1,6 @@
 export type Moment = "morning" | "afternoon" | "evening";
 export type SafetyState = "normal" | "crisis";
+export type Language = "th" | "en";
 export type Feedback = "yes" | "no" | "unsure" | null;
 
 export type DailyEntry = {
@@ -154,4 +155,82 @@ export type PitchPoint = {
   id: string;
   label: string;
   done: boolean;
+};
+
+export type RiskLevel = "flow" | "friction" | "recovery" | "sos";
+
+export type TimeBlock = {
+  start: string;
+  end: string;
+  label: string;
+};
+
+export type ContextLayer = {
+  weather: {
+    temperature: number;
+    humidity: number;
+    aqi: number;
+    pm25?: number;
+    uvIndex: number;
+    condition: string;
+    location: string;
+    heatIndex: number;
+  };
+  calendar: {
+    events: CalendarEvent[];
+    intensity: "light" | "moderate" | "heavy" | "sprint";
+    freeBlocks: TimeBlock[];
+  };
+  user: {
+    sleep: {
+      hours: number;
+      quality: number;
+      bedtime: string;
+    };
+    energy: number;
+    mood: number;
+    stress: number;
+    diary: string;
+    lastCheckIn: string;
+    language: Language;
+  };
+};
+
+export type IntelligenceOutput = {
+  briefing: string;
+  riskLevel: RiskLevel;
+  riskScore: number;
+  prediction: {
+    crashTime?: string;
+    confidence: number;
+    reasoning: string;
+  };
+  recommendation: {
+    primary: string;
+    alternatives: string[];
+    timing: string;
+  };
+  scheduleAdjustment: {
+    suggestReschedule: boolean;
+    movedEvents?: CalendarEvent[];
+    addedRecovery?: TimeBlock;
+  };
+  reasoningTrail: string[];
+};
+
+export type ExternalContext = {
+  source: "live" | "mock" | "partial";
+  location: string;
+  aqi: number;
+  pm25?: number;
+  temperature: number;
+  heatIndex: number;
+  humidity: number;
+  condition: string;
+  updatedAt?: string;
+  providers: {
+    openaq: boolean;
+    tmd: boolean;
+  };
+  notes: string[];
 };

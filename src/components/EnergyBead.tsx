@@ -1,12 +1,39 @@
 "use client";
 
-const MOODS = ["หนัก", "ต่ำ", "พอไหว", "ดี", "ลื่น"];
+import type { Language } from "@/lib/types";
 
-export function EnergyBead({ value, onChange }: { value: number; onChange: (next: number) => void }) {
+const MOODS: Record<Language, string[]> = {
+  th: ["หนัก", "ต่ำ", "พอไหว", "ดี", "ลื่น"],
+  en: ["Heavy", "Low", "Okay", "Good", "Flow"]
+};
+
+const LABELS: Record<Language, { aria: string; empty: string }> = {
+  th: {
+    aria: "เลือกพลังงานวันนี้",
+    empty: "แตะเพื่อเลือก"
+  },
+  en: {
+    aria: "Choose today's energy",
+    empty: "Tap to choose"
+  }
+};
+
+export function EnergyBead({
+  value,
+  language = "th",
+  onChange
+}: {
+  value: number;
+  language?: Language;
+  onChange: (next: number) => void;
+}) {
+  const moods = MOODS[language];
+  const labels = LABELS[language];
+
   return (
     <>
-      <div className="energy-bead-track mt-4" role="group" aria-label="เลือกพลังงานวันนี้">
-        {MOODS.map((label, index) => {
+      <div className="energy-bead-track mt-4" role="group" aria-label={labels.aria}>
+        {moods.map((label, index) => {
           const bead = index + 1;
           return (
             <button
@@ -14,7 +41,7 @@ export function EnergyBead({ value, onChange }: { value: number; onChange: (next
               id={`mood-btn-${bead}`}
               onClick={() => onChange(bead)}
               className={`energy-bead ${value === bead ? "energy-bead-active" : ""}`}
-              aria-label={`พลังงานวันนี้: ${label}`}
+              aria-label={`${labels.aria}: ${label}`}
               style={{ background: beadColor(bead) }}
             >
               <span>{bead}</span>
@@ -23,7 +50,7 @@ export function EnergyBead({ value, onChange }: { value: number; onChange: (next
         })}
       </div>
       <p className="mt-2 text-center text-xs font-bold text-ink/45">
-        {value ? MOODS[value - 1] : "แตะเพื่อเลือก"}
+        {value ? moods[value - 1] : labels.empty}
       </p>
     </>
   );

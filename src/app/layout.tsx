@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RoutineSense AI — ผู้ช่วยดูแลพลังงานประจำวัน",
+  title: "RoutineSense AI — Bangkok Energy Copilot",
   description:
-    "RoutineSense เรียนรู้สิ่งที่ทำให้พลังงานตก แล้วช่วยแนะนำก่อนวันหลุดจังหวะ สำหรับชีวิตเมืองไทยในยุค post-AGI",
+    "RoutineSense learns the patterns behind daily energy dips and helps before the day slips out of rhythm.",
   openGraph: {
     title: "RoutineSense AI",
-    description: "ผู้ช่วยดูแลพลังงานประจำวันสำหรับชีวิตเมืองไทย",
+    description: "A Thai-first post-AGI wellness copilot for Bangkok life.",
     type: "website"
   }
 };
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

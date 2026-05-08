@@ -2,7 +2,7 @@
 
 import { BriefcaseBusiness, Check, Coffee, Footprints, Moon, Sparkles, X } from "lucide-react";
 import { useState } from "react";
-import type { PatternMemory } from "@/lib/types";
+import type { Language, PatternMemory } from "@/lib/types";
 
 const PATTERN_STYLE: Record<
   string,
@@ -14,19 +14,28 @@ const PATTERN_STYLE: Record<
   "movement-buffer": { icon: Footprints, color: "#45b5c4", accent: "#c8e6f9", bg: "rgba(200,230,249,0.4)" }
 };
 
-const CONFIDENCE_STYLE: Record<string, { label: string; color: string; bg: string }> = {
-  high:   { label: "มั่นใจสูง",   color: "#45624d", bg: "#dceee2" },
-  medium: { label: "กลาง",    color: "#7a5b30", bg: "#f4c95d33" },
-  low:    { label: "เริ่มเห็น",  color: "#7a4a40", bg: "#ffd4b233" }
+const CONFIDENCE_STYLE: Record<Language, Record<string, { label: string; color: string; bg: string }>> = {
+  en: {
+    high:   { label: "High confidence", color: "#45624d", bg: "#dceee2" },
+    medium: { label: "Medium", color: "#7a5b30", bg: "#f4c95d33" },
+    low:    { label: "Early signal", color: "#7a4a40", bg: "#ffd4b233" }
+  },
+  th: {
+    high:   { label: "มั่นใจสูง", color: "#45624d", bg: "#dceee2" },
+    medium: { label: "กลาง", color: "#7a5b30", bg: "#f4c95d33" },
+    low:    { label: "เริ่มเห็น", color: "#7a4a40", bg: "#ffd4b233" }
+  }
 };
 
 export function PatternCard({
   pattern,
   basedOn = [],
+  language = "en",
   onDecision
 }: {
   pattern: PatternMemory;
   basedOn?: string[];
+  language?: Language;
   onDecision?: (decision: "confirmed" | "dismissed") => void;
 }) {
   const [decision, setDecision] = useState<"idle" | "confirmed" | "dismissed">("idle");
@@ -37,7 +46,7 @@ export function PatternCard({
     accent: "#dceee2",
     bg: "rgba(220,238,226,0.4)"
   };
-  const conf = CONFIDENCE_STYLE[pattern.confidence] ?? CONFIDENCE_STYLE.low;
+  const conf = CONFIDENCE_STYLE[language][pattern.confidence] ?? CONFIDENCE_STYLE[language].low;
   const Icon = style.icon;
 
   return (
@@ -85,7 +94,9 @@ export function PatternCard({
             className="mb-3 rounded-full bg-white px-3 py-1.5 text-[10px] font-black text-ink/58 shadow-sm"
             onClick={() => setShowTrail((value) => !value)}
           >
-            {showTrail ? "ซ่อนวันที่ใช้เทียบ" : "อิงจากวันเหล่านี้"}
+            {showTrail
+              ? language === "th" ? "ซ่อนวันที่ใช้เทียบ" : "Hide evidence days"
+              : language === "th" ? "อิงจากวันเหล่านี้" : "Based on these days"}
           </button>
         )}
 
@@ -99,7 +110,11 @@ export function PatternCard({
           </div>
         )}
 
-        <p className="text-[10px] italic text-ink/40 mb-3">เป็น pattern ระยะแรก ยังไม่ใช่ข้อสรุป คุณรู้สึกว่าตรงไหม</p>
+        <p className="text-[10px] italic text-ink/40 mb-3">
+          {language === "th"
+            ? "เป็น pattern ระยะแรก ยังไม่ใช่ข้อสรุป คุณรู้สึกว่าตรงไหม"
+            : "Early pattern, not a conclusion. Does this match your lived experience?"}
+        </p>
 
         {/* Confirm button */}
         <div className="flex gap-2">
@@ -117,7 +132,9 @@ export function PatternCard({
             }}
           >
             <Check size={11} />
-            {decision === "confirmed" ? "ยืนยันแล้ว" : "ตรงนะ"}
+            {decision === "confirmed"
+              ? language === "th" ? "ยืนยันแล้ว" : "Confirmed"
+              : language === "th" ? "ตรงนะ" : "Feels true"}
           </button>
           <button
             onClick={() => {
@@ -129,7 +146,7 @@ export function PatternCard({
             }`}
           >
             <X size={11} />
-            ไม่ตรง
+            {language === "th" ? "ไม่ตรง" : "Not me"}
           </button>
         </div>
       </div>

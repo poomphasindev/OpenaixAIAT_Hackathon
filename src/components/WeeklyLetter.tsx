@@ -1,7 +1,7 @@
 "use client";
 
 import { Archive, Mail, MessageCircle, Send, Sparkles } from "lucide-react";
-import type { WeeklyLetter as WeeklyLetterType } from "@/lib/types";
+import type { Language, WeeklyLetter as WeeklyLetterType } from "@/lib/types";
 
 const HIGHLIGHT_STYLE: Record<WeeklyLetterType["highlights"][number]["type"], string> = {
   win: "bg-mint text-moss",
@@ -10,14 +10,36 @@ const HIGHLIGHT_STYLE: Record<WeeklyLetterType["highlights"][number]["type"], st
   surprise: "bg-sky-50 text-ink"
 };
 
-export function WeeklyLetter({ letter }: { letter: WeeklyLetterType }) {
+const COPY: Record<Language, { eyebrow: string; week: string; logged: string; suggestion: string; share: string; archive: string; reply: string }> = {
+  en: {
+    eyebrow: "Luma's letter",
+    week: "Week",
+    logged: "days logged",
+    suggestion: "Luma suggests",
+    share: "Share",
+    archive: "Archive",
+    reply: "Reply"
+  },
+  th: {
+    eyebrow: "จดหมายจาก Luma",
+    week: "สัปดาห์ที่",
+    logged: "วัน",
+    suggestion: "Luma แนะนำ",
+    share: "แชร์",
+    archive: "เก็บ",
+    reply: "ตอบ"
+  }
+};
+
+export function WeeklyLetter({ letter, language = "en" }: { letter: WeeklyLetterType; language?: Language }) {
+  const copy = COPY[language];
   return (
     <section className="weekly-letter app-panel">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">จดหมายจาก Luma</p>
-          <h3 className="text-lg font-black text-ink">สัปดาห์ที่ {letter.weekNumber}</h3>
-          <p className="text-xs font-bold text-ink/45">บันทึก {letter.daysLogged}/7 วัน</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-moss">{copy.eyebrow}</p>
+          <h3 className="text-lg font-black text-ink">{copy.week} {letter.weekNumber}</h3>
+          <p className="text-xs font-bold text-ink/45">{letter.daysLogged}/7 {copy.logged}</p>
         </div>
         <span className="grid h-10 w-10 place-items-center rounded-2xl bg-ink text-white">
           <Mail size={17} />
@@ -41,7 +63,7 @@ export function WeeklyLetter({ letter }: { letter: WeeklyLetterType }) {
       </div>
 
       <div className="mt-4 rounded-2xl bg-mint/65 p-3">
-        <p className="text-[10px] font-black uppercase tracking-wide text-moss">Luma แนะนำ</p>
+        <p className="text-[10px] font-black uppercase tracking-wide text-moss">{copy.suggestion}</p>
         <p className="mt-1 text-sm font-black leading-5 text-ink">{letter.recommendation}</p>
       </div>
 
@@ -52,9 +74,9 @@ export function WeeklyLetter({ letter }: { letter: WeeklyLetterType }) {
       <p className="mt-4 whitespace-pre-line text-sm font-bold leading-6 text-ink/70">{letter.closing}</p>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <button className="rounded-2xl bg-ink px-2 py-2.5 text-xs font-black text-white"><Send size={13} className="mx-auto" />แชร์</button>
-        <button className="rounded-2xl bg-white px-2 py-2.5 text-xs font-black text-ink/62 shadow-sm"><Archive size={13} className="mx-auto" />เก็บ</button>
-        <button className="rounded-2xl bg-white px-2 py-2.5 text-xs font-black text-ink/62 shadow-sm"><MessageCircle size={13} className="mx-auto" />ตอบ</button>
+        <button className="rounded-2xl bg-ink px-2 py-2.5 text-xs font-black text-white"><Send size={13} className="mx-auto" />{copy.share}</button>
+        <button className="rounded-2xl bg-white px-2 py-2.5 text-xs font-black text-ink/62 shadow-sm"><Archive size={13} className="mx-auto" />{copy.archive}</button>
+        <button className="rounded-2xl bg-white px-2 py-2.5 text-xs font-black text-ink/62 shadow-sm"><MessageCircle size={13} className="mx-auto" />{copy.reply}</button>
       </div>
     </section>
   );
