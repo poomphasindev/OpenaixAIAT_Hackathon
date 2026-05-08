@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 const MOCK_CONTEXT: ExternalContext = {
   source: "mock",
-  location: "กรุงเทพฯ",
+  location: "Bangkok",
   aqi: 145,
   pm25: 52,
   temperature: 34,
@@ -28,7 +28,7 @@ type NextFetchInit = RequestInit & {
 export async function GET() {
   const openAqKey = process.env.OPENAQ_API_KEY;
   const openAqBaseUrl = process.env.OPENAQ_BASE_URL ?? "https://api.openaq.org/v3";
-  const openAqLocationId = process.env.OPENAQ_LOCATION_ID ?? "2178";
+  const openAqLocationId = process.env.OPENAQ_LOCATION_ID ?? "418";
   const tmdKey = process.env.TMD_API_KEY ?? process.env.TMD_WEATHER_API_KEY;
   const tmdUrl = process.env.TMD_WEATHER_URL ?? "https://data.tmd.go.th/api/WeatherToday/V1/?uid=api&format=json";
   const tmdUid = process.env.TMD_UID ?? "api";
@@ -45,7 +45,20 @@ export async function GET() {
       }, 4500);
 
       if (openAqResponse.ok) {
-        openAqContext = normalizeOpenAq(await openAqResponse.json());
+        const openAqPayload = await openAqResponse.json();
+        openAqContext = normalizeOpenAq(openAqPayload);
+        if (!openAqContext) {
+          const sensorId = findPm25SensorId(openAqPayload);
+          if (sensorId) {
+            const sensorResponse = await fetchWithTimeout(`${openAqBaseUrl.replace(/\/$/, "")}/sensors/${sensorId}`, {
+              headers: { "X-API-Key": openAqKey },
+              next: { revalidate: 900 }
+            }, 4500);
+            if (sensorResponse.ok) {
+              openAqContext = normalizeOpenAqSensor(await sensorResponse.json(), openAqPayload);
+            }
+          }
+        }
         if (!openAqContext) {
           notes.push("OpenAQ response had no usable Thailand PM2.5/AQI data.");
         }
@@ -122,7 +135,7 @@ function buildTmdUrl(baseUrl: string, key: string, uid: string) {
 function normalizeOpenAq(payload: unknown): Partial<ExternalContext> | null {
   const root = payload as Record<string, unknown>;
   const result = Array.isArray(root.results) ? root.results[0] as Record<string, unknown> : root;
-  const location = pickString(result, ["name", "locality", "city"]) ?? "กรุงเทพฯ";
+  const location = pickString(result, ["name", "locality", "city"]) ?? "Bangkok";
   const countryText = JSON.stringify(result.country ?? "").toLowerCase();
   const isThailandContext =
     countryText.includes('"th"') ||
@@ -137,11 +150,58 @@ function normalizeOpenAq(payload: unknown): Partial<ExternalContext> | null {
   }
 
   return {
-    location: /bangkok|กรุงเทพ/i.test(location) ? "กรุงเทพฯ" : location,
+    location: /bangkok|กรุงเทพ/i.test(location) ? "Bangkok" : location,
     ...(typeof pm25 === "number" ? { pm25 } : {}),
     ...(typeof aqi === "number" ? { aqi } : {}),
     condition: typeof aqi === "number" && aqi >= 100 ? "hazy" : "clear"
   };
+}
+
+function normalizeOpenAqSensor(sensorPayload: unknown, locationPayload: unknown): Partial<ExternalContext> | null {
+  const measurement = findOpenAqMeasurement(sensorPayload);
+  if (!measurement) return null;
+
+  const root = locationPayload as Record<string, unknown>;
+  const locationResult = Array.isArray(root.results) ? root.results[0] as Record<string, unknown> : root;
+  const location = pickString(locationResult, ["name", "locality", "city"]) ?? "Bangkok";
+  const countryText = JSON.stringify(locationResult.country ?? "").toLowerCase();
+  const isThailandContext =
+    countryText.includes('"th"') ||
+    countryText.includes("thailand") ||
+    /bangkok|กรุงเทพ|thailand|thai|chatuchak|dindaeng|nonthaburi/i.test(location);
+
+  if (!isThailandContext) return null;
+
+  return {
+    location: /bangkok|กรุงเทพ|chatuchak|dindaeng/i.test(location) ? "Bangkok" : location,
+    pm25: measurement.value,
+    aqi: pm25ToUsAqi(measurement.value),
+    condition: measurement.value >= 35 ? "hazy" : "clear"
+  };
+}
+
+function findPm25SensorId(payload: unknown): number | null {
+  if (!payload || typeof payload !== "object") return null;
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const id = findPm25SensorId(item);
+      if (id) return id;
+    }
+    return null;
+  }
+
+  const record = payload as Record<string, unknown>;
+  const parameter = JSON.stringify(record.parameter ?? "").toLowerCase();
+  if ((parameter.includes("pm25") || parameter.includes("pm2.5")) && typeof record.id === "number") {
+    return record.id;
+  }
+
+  for (const value of Object.values(record)) {
+    const id = findPm25SensorId(value);
+    if (id) return id;
+  }
+
+  return null;
 }
 
 function findOpenAqMeasurement(node: unknown): { value: number; unit?: string } | null {
