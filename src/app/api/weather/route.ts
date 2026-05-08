@@ -160,6 +160,10 @@ function normalizeOpenAq(payload: unknown): Partial<ExternalContext> | null {
 function normalizeOpenAqSensor(sensorPayload: unknown, locationPayload: unknown): Partial<ExternalContext> | null {
   const measurement = findOpenAqMeasurement(sensorPayload);
   if (!measurement) return null;
+  const latestDate = findOpenAqDateTime(sensorPayload);
+  if (latestDate && Date.now() - latestDate.getTime() > 7 * 24 * 60 * 60 * 1000) {
+    return null;
+  }
 
   const root = locationPayload as Record<string, unknown>;
   const locationResult = Array.isArray(root.results) ? root.results[0] as Record<string, unknown> : root;
@@ -178,6 +182,35 @@ function normalizeOpenAqSensor(sensorPayload: unknown, locationPayload: unknown)
     aqi: pm25ToUsAqi(measurement.value),
     condition: measurement.value >= 35 ? "hazy" : "clear"
   };
+}
+
+function findOpenAqDateTime(payload: unknown): Date | null {
+  if (!payload || typeof payload !== "object") return null;
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const found = findOpenAqDateTime(item);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  const record = payload as Record<string, unknown>;
+  const datetime = record.datetime;
+  if (datetime && typeof datetime === "object" && !Array.isArray(datetime)) {
+    const datetimeRecord = datetime as Record<string, unknown>;
+    const value = typeof datetimeRecord.utc === "string" ? datetimeRecord.utc : datetimeRecord.local;
+    if (typeof value === "string") {
+      const parsed = new Date(value);
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+  }
+
+  for (const value of Object.values(record)) {
+    const found = findOpenAqDateTime(value);
+    if (found) return found;
+  }
+
+  return null;
 }
 
 function findPm25SensorId(payload: unknown): number | null {
